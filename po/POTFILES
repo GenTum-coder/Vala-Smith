@@ -1,0 +1,7 @@
+data/org.example.vala-smith.desktop.in
+data/org.example.vala-smith.appdata.xml.in
+data/org.example.vala-smith.gschema.xml
+src/window.ui
+src/main.vala
+src/window.vala
+
