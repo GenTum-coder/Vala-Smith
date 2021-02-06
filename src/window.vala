@@ -1,6 +1,6 @@
 /* window.vala
  *
- * Copyright 2021 Gena
+ * Copyright 2021 Gena <unknown@domain.org>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -50,3 +50,4 @@ namespace ValaSmith {
 		}
 	}
 }
+

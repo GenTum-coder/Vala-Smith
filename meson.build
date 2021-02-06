@@ -8,6 +8,9 @@ project('vala-smith', ['c', 'vala'],
 i18n = import('i18n')
 
 
+cc = meson.get_compiler('c')
+math = cc.find_library('m', required: false)
+
 
 subdir('data')
 subdir('src')

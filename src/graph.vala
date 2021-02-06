@@ -1,96 +1,166 @@
-
+/* graph.vala
+ *
+ * Copyright 2021 Gena <unknown@domain.org>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * SPDX-License-Identifier: GPL-3.0-or-later
+*/
 
 using Gtk;
 
+//extern vsin(double v);
+//extern vcos(double v);
+
 namespace Graph {
 
-    public class Smith : DrawingArea {
+	public class Smith : DrawingArea {
 
-        //private Time time;
-        //private int minute_offset;
-        //private bool dragging;
-
-        //public signal void time_changed (int hour, int minute);
-        //
+		// private var
 		private int Xsize;
 		private int Ysize;
-        private int x;
-        private int y;
-        private double r;
+		private int MinXY;
+		private int R;		// radius (1.0)
+		private int C;		// center
 
-        public Smith () {
-            //x = get_allocated_width () / 2;
-            //y = get_allocated_height () / 2;
-            //radius = double.min (get_allocated_width () / 2,
-            //                     get_allocated_height () / 2) - 5;
-            Xsize = 20;
-            Ysize = 20;
-            x = 100 / 2;
-            y = 50 / 2;
-            r = 25 - 5;
+		// public var
+		public double[] re;
+		public double[] im;
+		public int      N;
 
-//            add_events (Gdk.EventMask.BUTTON_PRESS_MASK
-//                      | Gdk.EventMask.BUTTON_RELEASE_MASK
-//                      | Gdk.EventMask.POINTER_MOTION_MASK);
-//            update ();
+		public Smith () {
+			double alpha;
+			re = new double[2048];
+			im = new double[2048];
+			N     = 0;
+			Xsize = 20;
+			Ysize = 20;
+			MinXY = int.min (Xsize, Ysize);
+			R     = MinXY/2 - 10;
+			C     = MinXY/2;
 
-            // update the clock once a second
-//            Timeout.add (1000, update);
-        }
+			// for test
+			for (int i=0;i<360;i++){
+				alpha = i*2*Math.PI/360.0;
+				re[i] = Math.cos(alpha);
+				im[i] = Math.sin(alpha);
+				N++;
+			}
 
-        private void redraw_canvas () {
-            var window = get_window ();
-            if (null == window) {
-                return;
-            }
+		}
 
-            var region = window.get_clip_region ();
-            // redraw the cairo canvas completely by exposing it
-            window.invalidate_region (region, true);
-            //window.process_updates (true);
-        }
+		private void redraw_canvas () {
+			var window = get_window ();
+			if (null == window) {
+				return;
+			}
 
-        public override bool draw (Cairo.Context cr) {
-            Xsize = get_allocated_width ();
-            Ysize = get_allocated_height ();
-            var x1 = Xsize / 2;
-            var y1 = Ysize / 2;
-            var r1 = double.min (Xsize / 2, Ysize / 2) - 5;
+			var region = window.get_clip_region ();
+			// redraw the cairo canvas completely by exposing it
+			window.invalidate_region (region, true);
+			//window.process_updates (true);
+		}
 
-            //
-            cr.arc (x1, y1, r1, 0, 2 * Math.PI);
-            //cr.set_source_rgb (1, 1, 1);
-            //cr.fill_preserve ();
-            //cr.set_source_rgb (0, 0, 0);
-            cr.stroke ();
+		public override bool draw (Cairo.Context cr) {
+			Xsize = get_allocated_width ();
+			Ysize = get_allocated_height ();
+			MinXY = int.min (Xsize, Ysize);
+			R     = MinXY/2 - 10;
+			C     = MinXY/2;
+			var x1 = Xsize / 2;
+			var y1 = Ysize / 2;
+			var r1 = double.min (Xsize / 2, Ysize / 2) - 5;
 
-            //
-            cr.arc (x, y, r, 0, 2 * Math.PI);
-            //cr.set_source_rgb (1, 1, 1);
-            //cr.fill_preserve ();
-            //cr.set_source_rgb (0, 0, 0);
-            cr.stroke ();
+			cr.set_source_rgb (0.0, 0.0, 0.0);
 
-			cr.move_to (10, 10);
-			cr.line_to (Xsize-10, 10);
-			cr.line_to (Xsize-10, Ysize-10);
-			cr.line_to (10, Ysize-10);
-			cr.line_to (10, 10);
+			// set square
+			cr.move_to (C - R, C - R);
+			cr.line_to (C + R, C - R);
+			cr.line_to (C + R, C + R);
+			cr.line_to (C - R, C + R);
+			cr.line_to (C - R, C - R);
 			cr.stroke ();
 
-            return false;
-        }
+			// set LAxis
 
-        public bool update () {
-            // update the
-            x = 200 / 2;
-            y = 100 / 2;
-            r = 50 - 5;
+			cr.set_source_rgb (0.85, 0.85, 0.85);
 
-            redraw_canvas ();
-            return true;        // keep running this event
-        }
+			// set 0,0 lines
+			cr.move_to (C - R, C);
+			cr.line_to (C + R, C);
+			cr.move_to (C, C - R);
+			cr.line_to (C, C + R);
+			cr.stroke ();
 
-    }
+			// set grids Smith real
+			// r = 0.0 : C = r/(1 + r), 0 R = 1/(1 + r) : 0.0, 0.0, 1.0
+			x1 = C + 0;
+			y1 = C + 0;
+			r1 = 1*R;
+			cr.arc (x1, y1, r1, 0, 2 * Math.PI);
+			// r = 0.2 : C = r/(1 + r), 0 R = 1/(1 + r) : 1.0/6.0, 0.0, 5.0/6.0
+			x1 = C + R/6;
+			y1 = C + 0;
+			r1 = 5*R/6;
+			cr.arc (x1, y1, r1, 0, 2 * Math.PI);
+			//cr.stroke ();
+			// r = 0.5 : C = r/(1 + r), 0 R = 1/(1 + r) : 1.0/3.0, 0.0, 2.0/3.0
+			x1 = C + R/3;
+			y1 = C + 0;
+			r1 = 2*R/3;
+			cr.arc (x1, y1, r1, 0, 2 * Math.PI);
+			// r = 1.0 : C = r/(1 + r), 0 R = 1/(1 + r) : 0.5, 0.0, 0.5
+			x1 = C + R/2;
+			y1 = C + 0;
+			r1 = 1*R/2;
+			cr.arc (x1, y1, r1, 0, 2 * Math.PI);
+			// r = 2.0 : C = r/(1 + r), 0 R = 1/(1 + r) : 2.0/3.0, 0.0, 1.0/3.0
+			x1 = C + 2*R/3;
+			y1 = C + 0;
+			r1 = 1*R/3;
+			cr.arc (x1, y1, r1, 0, 2 * Math.PI);
+			// r = 5.0 : C = r/(1 + r), 0 R = 1/(1 + r) : 5.0/6.0, 0.0, 1.0/6.0
+			x1 = C + 5*R/6;
+			y1 = C + 0;
+			r1 = 1*R/6;
+			cr.arc (x1, y1, r1, 0, 2 * Math.PI);
+			cr.stroke ();
+
+			//cr.set_source_rgb (1, 1, 1);
+			cr.set_source_rgb (0.0, 0.0, 0.0);
+
+			//
+			x1 = 10 + R + (int)Math.floor(R*re[0]);
+			y1 = 10 + R + (int)Math.floor(R*im[0]);
+			cr.move_to (x1, y1);
+			for (int i=1; i<N;i++) {
+				x1 = 10 + R + (int)Math.floor(R*re[i]);
+				y1 = 10 + R + (int)Math.floor(R*im[i]);
+				cr.line_to (x1, y1);
+			}
+			cr.stroke ();
+
+			return false;
+		}
+
+		public bool update () {
+			// update the
+
+			redraw_canvas ();
+			return true;        // keep running this event
+		}
+
+	}
 }
 
