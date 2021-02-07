@@ -26,6 +26,8 @@ namespace ValaSmith {
 		[GtkChild] Gtk.Button button1;
 		[GtkChild] Gtk.Button button2;
 		[GtkChild] Gtk.Button button3;
+		[GtkChild] Gtk.Button button4;
+		[GtkChild] Gtk.Label  label1;
 
 		Graph.Smith smith;
 		double alpha;
@@ -43,9 +45,26 @@ namespace ValaSmith {
 			alpha += Math.PI/180.0;
 		}
 
-		private void on_marker() {
+		private void on_marker_inc() {
+			var re = 0.0;
+			var im = 0.0;
+			char[] buf = new char[double.DTOSTR_BUF_SIZE];
 			M++;
+			if (!smith.marker(M)) M--;
+			smith.getvalue(&re, &im);
+			//label1.label = "Re = "+re.to_string()+" Im = "+im.to_string();
+			label1.label = "Re = "+re.format(buf, "%.3f")+" Im = "+im.format(buf, "%.3f");
+		}
+
+		private void on_marker_dec() {
+			var re = 0.0;
+			var im = 0.0;
+			char[] buf = new char[double.DTOSTR_BUF_SIZE];
+			if (M > 0) M--;
 			smith.marker(M);
+			smith.getvalue(&re, &im);
+			//label1.label = "Re = "+re.to_string()+" Im = "+im.to_string();
+			label1.label = "Re = "+re.format(buf, "%.3f")+" Im = "+im.format(buf, "%.3f");
 		}
 
 		public Window (Gtk.Application app) {
@@ -56,7 +75,8 @@ namespace ValaSmith {
 
 			button1.clicked.connect (this.on_clear);
 			button2.clicked.connect (this.on_add);
-			button3.clicked.connect (this.on_marker);
+			button3.clicked.connect (this.on_marker_dec);
+			button4.clicked.connect (this.on_marker_inc);
 
 			smith = new Graph.Smith ();
 			box11.pack_start (smith, true, true, 0);
