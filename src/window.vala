@@ -22,29 +22,35 @@ using Graph;
 namespace ValaSmith {
 	[GtkTemplate (ui = "/org/example/vala-smith/window.ui")]
 	public class Window : Gtk.ApplicationWindow {
-		//[GtkChild] Gtk.Box box1;
 		[GtkChild] Gtk.Box box11;
 		[GtkChild] Gtk.Button button1;
+		[GtkChild] Gtk.Button button2;
 
 		Graph.Smith smith;
-		//Gtk.Label label1;
+		double alpha;
 
-		private void on_click() {
-			//smith.redraw_canvas();
-			smith.update();
-			//label1.label = "Hello World!";
+		private void on_clear() {
+			smith.clear();
+		}
+
+		private void on_add() {
+			double re = Math.cos(alpha);
+			double im = Math.sin(alpha);
+			smith.add(re, im);
+			alpha += Math.PI/180.0;
 		}
 
 		public Window (Gtk.Application app) {
 			Object (application: app);
 
-			button1.clicked.connect (this.on_click);
+			alpha = 0.0;
+
+			button1.clicked.connect (this.on_clear);
+			button2.clicked.connect (this.on_add);
 
 			smith = new Graph.Smith ();
 			box11.pack_start (smith, true, true, 0);
 			//smith.set_size_request (600, 600);
-			//label1 = new Gtk.Label ("label1");
-			//box1.pack_start (label1, false, false, 0);
 
 			this.show_all ();
 		}

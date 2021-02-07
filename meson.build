@@ -9,8 +9,8 @@ i18n = import('i18n')
 
 
 cc = meson.get_compiler('c')
-math = cc.find_library('m', required: false)
-
+#math_dep = cc.find_library('m', required: false)
+math_dep = cc.find_library('m', required: true)
 
 subdir('data')
 subdir('src')

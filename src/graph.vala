@@ -19,9 +19,7 @@
 */
 
 using Gtk;
-
-//extern vsin(double v);
-//extern vcos(double v);
+using Math;
 
 namespace Graph {
 
@@ -35,14 +33,14 @@ namespace Graph {
 		private int C;		// center
 
 		// public var
-		public double[] re;
-		public double[] im;
+		public double[] Re;
+		public double[] Im;
 		public int      N;
 
 		public Smith () {
 			double alpha;
-			re = new double[2048];
-			im = new double[2048];
+			Re = new double[2048];
+			Im = new double[2048];
 			N     = 0;
 			Xsize = 20;
 			Ysize = 20;
@@ -53,8 +51,8 @@ namespace Graph {
 			// for test
 			for (int i=0;i<360;i++){
 				alpha = i*2*Math.PI/360.0;
-				re[i] = Math.cos(alpha);
-				im[i] = Math.sin(alpha);
+				Re[i] = Math.cos(alpha);
+				Im[i] = Math.sin(alpha);
 				N++;
 			}
 
@@ -120,11 +118,16 @@ namespace Graph {
 			y1 = C + 0;
 			r1 = 2*R/3;
 			cr.arc (x1, y1, r1, 0, 2 * Math.PI);
+			cr.stroke ();
 			// r = 1.0 : C = r/(1 + r), 0 R = 1/(1 + r) : 0.5, 0.0, 0.5
+			// reference (Z = 50 Ohm)
+			cr.set_source_rgb (0.9, 0.0, 0.7);
 			x1 = C + R/2;
 			y1 = C + 0;
 			r1 = 1*R/2;
 			cr.arc (x1, y1, r1, 0, 2 * Math.PI);
+			cr.stroke ();
+			cr.set_source_rgb (0.85, 0.85, 0.85);
 			// r = 2.0 : C = r/(1 + r), 0 R = 1/(1 + r) : 2.0/3.0, 0.0, 1.0/3.0
 			x1 = C + 2*R/3;
 			y1 = C + 0;
@@ -137,16 +140,110 @@ namespace Graph {
 			cr.arc (x1, y1, r1, 0, 2 * Math.PI);
 			cr.stroke ();
 
+			// set grids Smith im
+			double alpha;
+			double x2;
+			double y2;
+			double r2;
+			// x = 0.2 : C = 1 , 1/x R = 1/x : 1.0, 5.0, 5.0 : 180 < a <= 270
+			// x = -0.2 : C = 1 , 1/x R = 1/x : 1.0, -5.0, -5.0
+			alpha = Math.PI;
+			while (Math.cos(alpha)<-2.0/5.0) {alpha += Math.PI/360.0;}
+			x2 = 1.0 + 5.0*Math.cos(alpha);
+			y2 = 5.0 + 5.0*Math.sin(alpha);
+			r2 = Math.sqrt((x2*x2) + (y2*y2));
+			while (r2 > 1.0) {
+				alpha += Math.PI/360.0;
+				x2 = 1.0 + 5.0*Math.cos(alpha);
+				y2 = 5.0 + 5.0*Math.sin(alpha);
+				r2 = Math.sqrt((x2*x2) + (y2*y2));
+			}
+			cr.arc (C + R, C - 5*R, 5*R, Math.PI/2.0, 3.0*Math.PI/2.0-alpha+Math.PI/2.0);
+			cr.stroke ();
+			cr.arc (C + R, C + 5*R, 5*R, alpha, 3.0*Math.PI/2.0);
+			//cr.arc (C + R, C - R/2, R/2, Math.PI/2.0, 3.0*Math.PI/2.0);
+			//cr.arc (C + R, C + R/2, R/2, Math.PI/2.0, 3.0*Math.PI/2.0);
+			cr.stroke ();
+			// x = 0.5 : C = 1 , 1/x R = 1/x : 1.0, 2.0, 2.0 : 180 < a <= 270
+			// x = -0.5 : C = 1 , 1/x R = 1/x : 1.0, -2.0, -2.0
+			alpha = Math.PI;
+			while (Math.cos(alpha)<-2.0/2.0) {alpha += Math.PI/360.0;}
+			x2 = 1.0 + 2.0*Math.cos(alpha);
+			y2 = 2.0 + 2.0*Math.sin(alpha);
+			r2 = Math.sqrt((x2*x2) + (y2*y2));
+			while (r2 > 1.0) {
+				alpha += Math.PI/360.0;
+				x2 = 1.0 + 2.0*Math.cos(alpha);
+				y2 = 2.0 + 2.0*Math.sin(alpha);
+				r2 = Math.sqrt((x2*x2) + (y2*y2));
+			}
+			cr.arc (C + R, C - 2*R, 2*R, Math.PI/2.0, 3.0*Math.PI/2.0-alpha+Math.PI/2.0);
+			cr.stroke ();
+			cr.arc (C + R, C + 2*R, 2*R, alpha, 3.0*Math.PI/2.0);
+			cr.stroke ();
+			// x = 1.0 : C = 1 , 1/x R = 1/x : 1.0, 1.0, 1.0 : 90 < a <= 270
+			// x = 1.0 : C = 1 , 1/x R = 1/x : 1.0, -1.0, -1.0
+			alpha = Math.PI/2.0;
+			while (Math.cos(alpha)<-2.0/1.0) {alpha += Math.PI/360.0;}
+			x2 = 1.0 + 1.0*Math.cos(alpha);
+			y2 = 1.0 + 1.0*Math.sin(alpha);
+			r2 = Math.sqrt((x2*x2) + (y2*y2));
+			while (r2 > 1.0) {
+				alpha += Math.PI/360.0;
+				x2 = 1.0 + 1.0*Math.cos(alpha);
+				y2 = 1.0 + 1.0*Math.sin(alpha);
+				r2 = Math.sqrt((x2*x2) + (y2*y2));
+			}
+			cr.arc (C + R, C - 1*R, 1*R, Math.PI/2.0, 3.0*Math.PI/2.0-alpha+Math.PI/2.0);
+			cr.stroke ();
+			cr.arc (C + R, C + 1*R, 1*R, alpha, 3.0*Math.PI/2.0);
+			cr.stroke ();
+			// x = 2.0 : C = 1 , 1/x R = 1/x : 1.0, 0.5, 0.5 : 90 < a <= 270
+			// x = -2.0 : C = 1 , 1/x R = 1/x : 1.0, -0.5, -0.5
+			alpha = Math.PI/2.0;
+			while (Math.cos(alpha)<-2.0/0.5) {alpha += Math.PI/360.0;}
+			x2 = 1.0 + 0.5*Math.cos(alpha);
+			y2 = 0.5 + 0.5*Math.sin(alpha);
+			r2 = Math.sqrt((x2*x2) + (y2*y2));
+			while (r2 > 1.0) {
+				alpha += Math.PI/360.0;
+				x2 = 1.0 + 0.5*Math.cos(alpha);
+				y2 = 0.5 + 0.5*Math.sin(alpha);
+				r2 = Math.sqrt((x2*x2) + (y2*y2));
+			}
+			cr.arc (C + R, C - R/2, R/2, Math.PI/2.0, 3.0*Math.PI/2.0-alpha+Math.PI/2.0);
+			cr.stroke ();
+			cr.arc (C + R, C + R/2, R/2, alpha, 3.0*Math.PI/2.0);
+			cr.stroke ();
+			// x = 5.0 : C = 1 , 1/x R = 1/x : 1.0, 0.2, 0.2 : 90 < a <= 270
+			// x = -5.0 : C = 1 , 1/x R = 1/x : 1.0, -0.2, -0.2
+			alpha = Math.PI/2.0;
+			while (Math.cos(alpha)<-2.0/0.2) {alpha += Math.PI/360.0;}
+			x2 = 1.0 + 0.2*Math.cos(alpha);
+			y2 = 0.2 + 0.2*Math.sin(alpha);
+			r2 = Math.sqrt((x2*x2) + (y2*y2));
+			while (r2 > 1.0) {
+				alpha += Math.PI/360.0;
+				x2 = 1.0 + 0.2*Math.cos(alpha);
+				y2 = 0.2 + 0.2*Math.sin(alpha);
+				r2 = Math.sqrt((x2*x2) + (y2*y2));
+			}
+			cr.arc (C + R, C - R/5, R/5, Math.PI/2.0, 3.0*Math.PI/2.0-alpha+Math.PI/2.0);
+			cr.stroke ();
+			cr.arc (C + R, C + R/5, R/5, alpha, 3.0*Math.PI/2.0);
+			cr.stroke ();
+
 			//cr.set_source_rgb (1, 1, 1);
 			cr.set_source_rgb (0.0, 0.0, 0.0);
 
 			//
-			x1 = 10 + R + (int)Math.floor(R*re[0]);
-			y1 = 10 + R + (int)Math.floor(R*im[0]);
+			cr.set_source_rgb (0.0, 0.8, 0.0);
+			x1 = 10 + R + (int)Math.floor(R*Re[0]);
+			y1 = 10 + R + (int)Math.floor(R*Im[0]);
 			cr.move_to (x1, y1);
 			for (int i=1; i<N;i++) {
-				x1 = 10 + R + (int)Math.floor(R*re[i]);
-				y1 = 10 + R + (int)Math.floor(R*im[i]);
+				x1 = 10 + R + (int)Math.floor(R*Re[i]);
+				y1 = 10 + R + (int)Math.floor(R*Im[i]);
 				cr.line_to (x1, y1);
 			}
 			cr.stroke ();
@@ -157,6 +254,22 @@ namespace Graph {
 		public bool update () {
 			// update the
 
+			redraw_canvas ();
+			return true;        // keep running this event
+		}
+
+		public bool clear () {
+			// update the
+			N = 0;
+			redraw_canvas ();
+			return true;        // keep running this event
+		}
+
+		public bool add (double re, double im) {
+			// update the
+			Re[N] = re;
+			Im[N] = im;
+			N++;
 			redraw_canvas ();
 			return true;        // keep running this event
 		}
