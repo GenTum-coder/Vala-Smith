@@ -26,22 +26,27 @@ namespace Graph {
 	public class Smith : DrawingArea {
 
 		// private var
-		private int Xsize;
-		private int Ysize;
-		private int MinXY;
-		private int R;		// radius (1.0)
-		private int C;		// center
+		private int      Xsize;
+		private int      Ysize;
+		private int      MinXY;
+		private int      R;		// radius (1.0)
+		private int      C;		// center
+		private double[] Re;
+		private double[] Im;
+		private int      N;
+		private int      M;		// mark
 
 		// public var
-		public double[] Re;
-		public double[] Im;
-		public int      N;
+		//public double[] Re;
+		//public double[] Im;
+		//public int      N;
 
 		public Smith () {
 			double alpha;
 			Re = new double[2048];
 			Im = new double[2048];
 			N     = 0;
+			M     = 0;
 			Xsize = 20;
 			Ysize = 20;
 			MinXY = int.min (Xsize, Ysize);
@@ -236,23 +241,42 @@ namespace Graph {
 			//cr.set_source_rgb (1, 1, 1);
 			cr.set_source_rgb (0.0, 0.0, 0.0);
 
-			//
+			// draw
 			cr.set_source_rgb (0.0, 0.8, 0.0);
 			x1 = 10 + R + (int)Math.floor(R*Re[0]);
-			y1 = 10 + R + (int)Math.floor(R*Im[0]);
+			y1 = 10 + R - (int)Math.floor(R*Im[0]);
 			cr.move_to (x1, y1);
 			for (int i=1; i<N;i++) {
 				x1 = 10 + R + (int)Math.floor(R*Re[i]);
-				y1 = 10 + R + (int)Math.floor(R*Im[i]);
+				y1 = 10 + R - (int)Math.floor(R*Im[i]);
 				cr.line_to (x1, y1);
 			}
+			cr.stroke ();
+
+			// draw marker (triangle)
+			cr.set_source_rgb (0.8, 0.0, 0.0);
+			x1 = 10 + R + (int)Math.floor(R*Re[M]);
+			y1 = 10 + R - (int)Math.floor(R*Im[M]);
+			cr.move_to (x1, y1);
+			x1 += 5;
+			y1 -= 8;
+			cr.line_to (x1, y1);
+			x1 -= 10;
+			//y1 -= 6;
+			cr.line_to (x1, y1);
+			x1 += 5;
+			y1 += 8;
+			cr.line_to (x1, y1);
 			cr.stroke ();
 
 			return false;
 		}
 
-		public bool update () {
+		public bool marker (int m) {
 			// update the
+			if (m > N-1) M = N-1;
+			else if (m < 0) M = 0;
+			else M = m;
 
 			redraw_canvas ();
 			return true;        // keep running this event
@@ -261,6 +285,9 @@ namespace Graph {
 		public bool clear () {
 			// update the
 			N = 0;
+			M = 0;
+			Re[0] = 0.0;
+			Im[0] = 0.0;
 			redraw_canvas ();
 			return true;        // keep running this event
 		}

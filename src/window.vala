@@ -25,11 +25,14 @@ namespace ValaSmith {
 		[GtkChild] Gtk.Box box11;
 		[GtkChild] Gtk.Button button1;
 		[GtkChild] Gtk.Button button2;
+		[GtkChild] Gtk.Button button3;
 
 		Graph.Smith smith;
 		double alpha;
+		int    M;
 
 		private void on_clear() {
+			M = 0;
 			smith.clear();
 		}
 
@@ -40,13 +43,20 @@ namespace ValaSmith {
 			alpha += Math.PI/180.0;
 		}
 
+		private void on_marker() {
+			M++;
+			smith.marker(M);
+		}
+
 		public Window (Gtk.Application app) {
 			Object (application: app);
 
 			alpha = 0.0;
+			M     = 0;
 
 			button1.clicked.connect (this.on_clear);
 			button2.clicked.connect (this.on_add);
+			button3.clicked.connect (this.on_marker);
 
 			smith = new Graph.Smith ();
 			box11.pack_start (smith, true, true, 0);
