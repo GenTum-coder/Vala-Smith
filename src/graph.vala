@@ -77,6 +77,25 @@ namespace Graph {
 			//window.process_updates (true);
 		}
 
+		private double get_angle(double r) {
+			double angle;
+			double x, y, r2;
+
+			angle = Math.PI;
+			if (r < 1.0) angle /= 2.0;
+			while (Math.cos(angle)<-2.0/r) {angle += Math.PI/360.0;}
+			x = 1.0 + r*Math.cos(angle);
+			y = r*(1.0 + Math.sin(angle));
+			r2 = Math.sqrt((x*x) + (y*y));
+			while (r2 > 1.0) {
+				angle += Math.PI/360.0;
+				x = 1.0 + r*Math.cos(angle);
+				y = r*(1.0 + Math.sin(angle));
+				r2 = Math.sqrt((x*x) + (y*y));
+			}
+			return angle;
+		}
+
 		public override bool draw (Cairo.Context cr) {
 			Xsize = get_allocated_width ();
 			Ysize = get_allocated_height ();
@@ -149,96 +168,41 @@ namespace Graph {
 			cr.stroke ();
 
 			// set grids Smith im
-			double alpha;
-			double x2;
-			double y2;
-			double r2;
+			double angle;
 			// x = 0.2 : C = 1 , 1/x R = 1/x : 1.0, 5.0, 5.0 : 180 < a <= 270
 			// x = -0.2 : C = 1 , 1/x R = 1/x : 1.0, -5.0, -5.0
-			alpha = Math.PI;
-			while (Math.cos(alpha)<-2.0/5.0) {alpha += Math.PI/360.0;}
-			x2 = 1.0 + 5.0*Math.cos(alpha);
-			y2 = 5.0 + 5.0*Math.sin(alpha);
-			r2 = Math.sqrt((x2*x2) + (y2*y2));
-			while (r2 > 1.0) {
-				alpha += Math.PI/360.0;
-				x2 = 1.0 + 5.0*Math.cos(alpha);
-				y2 = 5.0 + 5.0*Math.sin(alpha);
-				r2 = Math.sqrt((x2*x2) + (y2*y2));
-			}
-			cr.arc (Cx + R, Cy - 5*R, 5*R, Math.PI/2.0, 3.0*Math.PI/2.0-alpha+Math.PI/2.0);
+			angle = get_angle(5.0);
+			cr.arc (Cx + R, Cy - 5*R, 5*R, Math.PI/2.0, 3.0*Math.PI/2.0-angle+Math.PI/2.0);
 			cr.stroke ();
-			cr.arc (Cx + R, Cy + 5*R, 5*R, alpha, 3.0*Math.PI/2.0);
-			//cr.arc (C + R, C - R/2, R/2, Math.PI/2.0, 3.0*Math.PI/2.0);
-			//cr.arc (C + R, C + R/2, R/2, Math.PI/2.0, 3.0*Math.PI/2.0);
+			cr.arc (Cx + R, Cy + 5*R, 5*R, angle, 3.0*Math.PI/2.0);
 			cr.stroke ();
 			// x = 0.5 : C = 1 , 1/x R = 1/x : 1.0, 2.0, 2.0 : 180 < a <= 270
 			// x = -0.5 : C = 1 , 1/x R = 1/x : 1.0, -2.0, -2.0
-			alpha = Math.PI;
-			while (Math.cos(alpha)<-2.0/2.0) {alpha += Math.PI/360.0;}
-			x2 = 1.0 + 2.0*Math.cos(alpha);
-			y2 = 2.0 + 2.0*Math.sin(alpha);
-			r2 = Math.sqrt((x2*x2) + (y2*y2));
-			while (r2 > 1.0) {
-				alpha += Math.PI/360.0;
-				x2 = 1.0 + 2.0*Math.cos(alpha);
-				y2 = 2.0 + 2.0*Math.sin(alpha);
-				r2 = Math.sqrt((x2*x2) + (y2*y2));
-			}
-			cr.arc (Cx + R, Cy - 2*R, 2*R, Math.PI/2.0, 3.0*Math.PI/2.0-alpha+Math.PI/2.0);
+			angle = get_angle(2.0);
+			cr.arc (Cx + R, Cy - 2*R, 2*R, Math.PI/2.0, 3.0*Math.PI/2.0-angle+Math.PI/2.0);
 			cr.stroke ();
-			cr.arc (Cx + R, Cy + 2*R, 2*R, alpha, 3.0*Math.PI/2.0);
+			cr.arc (Cx + R, Cy + 2*R, 2*R, angle, 3.0*Math.PI/2.0);
 			cr.stroke ();
 			// x = 1.0 : C = 1 , 1/x R = 1/x : 1.0, 1.0, 1.0 : 90 < a <= 270
 			// x = 1.0 : C = 1 , 1/x R = 1/x : 1.0, -1.0, -1.0
-			alpha = Math.PI/2.0;
-			while (Math.cos(alpha)<-2.0/1.0) {alpha += Math.PI/360.0;}
-			x2 = 1.0 + 1.0*Math.cos(alpha);
-			y2 = 1.0 + 1.0*Math.sin(alpha);
-			r2 = Math.sqrt((x2*x2) + (y2*y2));
-			while (r2 > 1.0) {
-				alpha += Math.PI/360.0;
-				x2 = 1.0 + 1.0*Math.cos(alpha);
-				y2 = 1.0 + 1.0*Math.sin(alpha);
-				r2 = Math.sqrt((x2*x2) + (y2*y2));
-			}
-			cr.arc (Cx + R, Cy - 1*R, 1*R, Math.PI/2.0, 3.0*Math.PI/2.0-alpha+Math.PI/2.0);
+			angle = get_angle(1.0);
+			cr.arc (Cx + R, Cy - 1*R, 1*R, Math.PI/2.0, 3.0*Math.PI/2.0-angle+Math.PI/2.0);
 			cr.stroke ();
-			cr.arc (Cx + R, Cy + 1*R, 1*R, alpha, 3.0*Math.PI/2.0);
+			cr.arc (Cx + R, Cy + 1*R, 1*R, angle, 3.0*Math.PI/2.0);
 			cr.stroke ();
 			// x = 2.0 : C = 1 , 1/x R = 1/x : 1.0, 0.5, 0.5 : 90 < a <= 270
 			// x = -2.0 : C = 1 , 1/x R = 1/x : 1.0, -0.5, -0.5
-			alpha = Math.PI/2.0;
-			while (Math.cos(alpha)<-2.0/0.5) {alpha += Math.PI/360.0;}
-			x2 = 1.0 + 0.5*Math.cos(alpha);
-			y2 = 0.5 + 0.5*Math.sin(alpha);
-			r2 = Math.sqrt((x2*x2) + (y2*y2));
-			while (r2 > 1.0) {
-				alpha += Math.PI/360.0;
-				x2 = 1.0 + 0.5*Math.cos(alpha);
-				y2 = 0.5 + 0.5*Math.sin(alpha);
-				r2 = Math.sqrt((x2*x2) + (y2*y2));
-			}
-			cr.arc (Cx + R, Cy - R/2, R/2, Math.PI/2.0, 3.0*Math.PI/2.0-alpha+Math.PI/2.0);
+			angle = get_angle(0.5);
+			cr.arc (Cx + R, Cy - R/2, R/2, Math.PI/2.0, 3.0*Math.PI/2.0-angle+Math.PI/2.0);
 			cr.stroke ();
-			cr.arc (Cx + R, Cy + R/2, R/2, alpha, 3.0*Math.PI/2.0);
+			cr.arc (Cx + R, Cy + R/2, R/2, angle, 3.0*Math.PI/2.0);
 			cr.stroke ();
 			// x = 5.0 : C = 1 , 1/x R = 1/x : 1.0, 0.2, 0.2 : 90 < a <= 270
 			// x = -5.0 : C = 1 , 1/x R = 1/x : 1.0, -0.2, -0.2
-			alpha = Math.PI/2.0;
-			while (Math.cos(alpha)<-2.0/0.2) {alpha += Math.PI/360.0;}
-			x2 = 1.0 + 0.2*Math.cos(alpha);
-			y2 = 0.2 + 0.2*Math.sin(alpha);
-			r2 = Math.sqrt((x2*x2) + (y2*y2));
-			while (r2 > 1.0) {
-				alpha += Math.PI/360.0;
-				x2 = 1.0 + 0.2*Math.cos(alpha);
-				y2 = 0.2 + 0.2*Math.sin(alpha);
-				r2 = Math.sqrt((x2*x2) + (y2*y2));
-			}
-			cr.arc (Cx + R, Cy - R/5, R/5, Math.PI/2.0, 3.0*Math.PI/2.0-alpha+Math.PI/2.0);
+			angle = get_angle(0.2);
+			cr.arc (Cx + R, Cy - R/5, R/5, Math.PI/2.0, 3.0*Math.PI/2.0-angle+Math.PI/2.0);
 			cr.stroke ();
-			cr.arc (Cx + R, Cy + R/5, R/5, alpha, 3.0*Math.PI/2.0);
+			cr.arc (Cx + R, Cy + R/5, R/5, angle, 3.0*Math.PI/2.0);
 			cr.stroke ();
 
 			//cr.set_source_rgb (1, 1, 1);
